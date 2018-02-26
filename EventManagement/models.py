@@ -54,7 +54,7 @@ class Volunteer(models.Model):
 
 class EventVolunteer(Volunteer):
     GROUP_NAME = "event_volunteer"
-    event = models.ForeignKey('Event', on_delete=models.CASCADE)
+    organizer = models.ForeignKey('Organizer', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
@@ -98,23 +98,23 @@ class RegistrationDesk(Volunteer):
         r = Volunteer.create(username, first_name, last_name, email, phone, cls.GROUP_NAME)
 
 
-class Head(Volunteer):
-    GROUP_NAME = "dept_head"
-
-    class Meta:
-        proxy = True
-
-    def __str__(self):
-        return self.user.username
-
-    @classmethod
-    def create(cls, username, first_name, last_name, email, phone, password):
-        r = Volunteer.create(username, first_name, last_name, email, phone, cls.GROUP_NAME)
+# class Head(Volunteer):
+#     GROUP_NAME = "dept_head"
+#
+#     class Meta:
+#         proxy = True
+#
+#     def __str__(self):
+#         return self.user.username
+#
+#     @classmethod
+#     def create(cls, username, first_name, last_name, email, phone, password):
+#         r = Volunteer.create(username, first_name, last_name, email, phone, cls.GROUP_NAME)
 
 
 class Organizer(models.Model):
     name = models.CharField(max_length=255)
-    head = models.OneToOneField(Head, on_delete=models.SET_NULL, null=True)
+    # head = models.OneToOneField(Head, on_delete=models.SET_NULL, null=True)
     code = models.CharField(max_length=10, unique=True)
 
     def __str__(self):

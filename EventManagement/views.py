@@ -27,10 +27,24 @@ def logout_user(request):
 
 @login_required
 def admin_panel(request):
-    context = {'event_list': Event.objects.all(), 'workshop_list': Workshop.objects.all(), 'user':request.user}
+    context = {'event_list': Event.objects.all(), 'workshop_list': Workshop.objects.all(), 'user': request.user}
     if belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
         event_volunteer = EventVolunteer.objects.get(user=request.user)
         context['event_volunteer'] = event_volunteer
+        org_events = Event.objects.filter(organizer=event_volunteer.organizer)
+        context['registrations'] = []
+        for i, event in enumerate(org_events):
+            context['registrations'].append({
+                'code': event.code,
+                'name': event.name,
+                'list': []
+            })
+            registrations = Registration.objects.filter(event=event)
+            for reg in registrations:
+                context['registrations'][i]['list'].append({
+                    'profile': reg.profile.serialize,
+                    'additonal_data': reg.additional_data,
+                })
         return render(request, 'EventManagement/event_volunteer_admin.html', context)
     elif belongs_to_group(request.user, RegistrationDesk.GROUP_NAME):
         event_volunteer = RegistrationDesk.objects.get(user=request.user)
@@ -39,6 +53,7 @@ def admin_panel(request):
         return render(request, 'EventManagement/event_volunteer_admin.html', context)
     elif belongs_to_group(request.user, RituAdmin.GROUP_NAME):
         context['admin'] = RituAdmin.objects.get(user=request.user)
+
         return render(request, "EventManagement/ritu_admin_admin.html", context)
     else:
         raise PermissionDenied("Not a authorized to view the page")
@@ -83,14 +98,16 @@ def add_profile(request):
 
 
 class UpdateEvent(View):
-    @group_login_required(group_name=EventVolunteer.GROUP_NAME)
     def get(self, request, event_code):
+        if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
+            raise PermissionDenied()
         event = get_object_or_404(Event, code=event_code)
         form = EventForm(instance=event)
         return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user})
 
-    @group_login_required(group_name=EventVolunteer.GROUP_NAME)
-    def post(self, request):
+    def post(self, request, event_code):
+        if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
+            raise PermissionDenied()
         form = EventForm(request.POST)
         if form.is_valid():
             form.save()
