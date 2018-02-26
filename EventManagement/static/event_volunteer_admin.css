@@ -1,0 +1,14 @@
+
+.form{
+    box-shadow: 0 0 1px #00000082;
+    border-radius: 5px;
+}
+.form h3{
+    padding: 4%;
+    background-color: lightblue;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.form form{
+    padding: 4%;
+}
