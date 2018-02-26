@@ -1,3 +1,4 @@
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
@@ -6,15 +7,21 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.http import require_http_methods
 
+from EventManagement.celery import send_email
 from EventManagement.forms import AddEventVolunteerForm, ProfileForm
 from EventManagement.utils import belongs_to_group, group_login_required
 from EventManagement.models import *
 
 
 def index(request):
-    if request.user is not None:
+    if request.user.is_authenticated:
         return redirect('admin_panel')
     return render(request, 'EventManagement/sign_in.html')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('index')
 
 
 @login_required
@@ -42,27 +49,11 @@ def admin_panel(request):
 
 
 @require_http_methods(["POST"])
-@group_login_required(group_name=Head.GROUP_NAME)
-def head_event_volunteer_add(request):
-    form = AddEventVolunteerForm(request.POST)
-    head = Head.objects.filter(user=request.user).select_related().first()
-    if form.is_valid():
-        event_volunteer = EventVolunteer.create(current_user=request.user,
-                                                first_name=form.cleaned_data['first_name'],
-                                                last_name=form.cleaned_data['last_name'],
-                                                email=form.cleaned_data['email'],
-                                                phone=form.cleaned_data['phone'],
-                                                password=form.cleaned_data['password'],
-                                                event_id=form.cleaned_data['event']
-                                                )
-        return redirect('admin_panel')
-    return render(request, "EventManagement/head_admin.html", {'form': form})
-
-
-@require_http_methods(["POST"])
 @group_login_required(group_name=RegistrationDesk.GROUP_NAME)
 def add_profile(request):
+    print('')
     form = ProfileForm(request.POST)
+    context={'event_list':[], 'workshop_list':[]}
     if form.is_valid():
         profile = form.save()
         events = Event.objects.all()
@@ -73,8 +64,9 @@ def add_profile(request):
                 r.registrar = request.user
                 r.profile = profile
                 if event.is_team_event:
-                    r.additional_data = request.POST[event.code+"_additional"]
+                    r.additional_data = request.POST[event.code + "_additional"]
                 r.save()
+                context['event_list'].append(event.name)
         workshops = Workshop.objects.all()
         for workshop in workshops:
             if workshop.code in request.POST:
@@ -83,66 +75,70 @@ def add_profile(request):
                 r.registrar = request.user
                 r.profile = profile
                 if event.is_team_event:
-                    r.additional_data = request.POST[event.code+"_additional"]
+                    r.additional_data = request.POST[event.code + "_additional"]
                 r.save()
+                context['workshop_list'].append(workshop.name)
+        send_email.delay(profile.serialize,context)
         return redirect('admin_panel')
+    print(form.errors)
     return render(request, "EventManagement/event_volunteer_admin.html", {'p_form': form,
                                                                           'event_list': Event.objects.all(),
                                                                           'workshop_list': Workshop.objects.all()})
 
 
+#####################################################
 def get_event_data(request):
     event_details = Event.objects.all()
     workshop_details = Workshop.objects.all()
     data = {
-        'events':[],
-        'workshops':[]
+        'events': [],
+        'workshops': []
     }
     for event in event_details:
         data['events'].append({
-            "code":event.code,
-            'name':event.name,
+            "code": event.code,
+            'name': event.name,
             'time': event.timing,
-            'organiser':event.organizer.name,
-            'amount':event.amount,
-            'additional':event.additional_data,
-            'is_team':event.is_team_event,
-            'venue':event.venue,
+            'organiser': event.organizer.name,
+            'amount': event.amount,
+            'additional': event.additional_data,
+            'is_team': event.is_team_event,
+            'venue': event.venue,
         })
     for event in workshop_details:
         data['workshops'].append({
-            "code":event.code,
+            "code": event.code,
             'name': event.name,
             'time': event.timing,
             'organiser': event.organizer.name if event.organizer is not None else "",
             'amount': event.amount,
             'is_team': event.is_team_event,
-            "venue":event.venue
+            "venue": event.venue
         })
     return JsonResponse(data=data)
 
 
 def get_user_data(request):
     data = {
-        'name':"test",
-        'college':"RIT",
-        'phone':'999999999',
-        'email':'test@test.com',
+        'name': "test",
+        'college': "RIT",
+        'phone': '999999999',
+        'email': 'test@test.com',
         'registrations': {
             'events': [
                 {
-                    'code':"CSE01",
+                    'code': "CSE01",
                 },
                 {
-                    'code':"CSE02"
+                    'code': "CSE02"
                 }
             ],
-            'workshops':[
+            'workshops': [
                 {
-                    'code':"CSEW01",
+                    'code': "CSEW01",
                 },
                 {
-                    'code':"CSEW02"
+                    'code': "CSEW02"
                 }
             ]
         }

@@ -6,7 +6,7 @@ from EventManagement.models import Profile, Event, Workshop
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = "__all__"
+        exclude = ['id_code']
 
 
 class AddEventVolunteerForm(forms.Form):

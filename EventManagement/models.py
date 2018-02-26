@@ -4,12 +4,30 @@ from django.db import models
 
 
 # Create your models here.
+from django.db.models import Max
+
 
 class Profile(models.Model):
     name = models.CharField(max_length=500)
     email = models.EmailField()
-    phone = models.CharField(max_length=15)
+    phone = models.CharField(max_length=15, unique=True)
     college = models.CharField(max_length=500)
+    id_code = models.CharField(max_length=250)
+
+    def save(self, *args,**kwargs):
+        code = Profile.objects.all().aggregate(Max('id'))['id__max']
+        self.id_code = "RITU" + str(code if code is not None else "00")
+        return super(Profile,self).save()
+
+    @property
+    def serialize(self):
+        return {
+            'name':self.name,
+            'email':self.email,
+            'phone':self.phone,
+            'college':self.college,
+            'id_code':self.id_code
+        }
 
     def __str__(self):
         return self.name
@@ -19,18 +37,17 @@ class Volunteer(models.Model):
     GROUP_NAME = "volunteer"
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='creator')
 
     def __str__(self):
         return self.user.username
 
     @staticmethod
-    def create(current_user, first_name, last_name, email, phone, password, group_name=None):
-        user = User(first_name=first_name, last_name=last_name, email=email)
+    def create(username, first_name, last_name, email, phone, password, group_name=GROUP_NAME):
+        user = User(username=username, first_name=first_name, last_name=last_name, email=email)
         user.password = make_password(password)
         user.save()
-        user.groups.add(Group.objects.filter(name=group_name))
-        v = Volunteer(user=user, phone=phone, created_by=current_user)
+        user.groups.add(Group.objects.filter(name=group_name).first())
+        v = Volunteer(user=user, phone=phone)
         v.save()
         return v
 
@@ -43,12 +60,12 @@ class EventVolunteer(Volunteer):
         return self.user.username
 
     @classmethod
-    def create(cls, current_user, first_name, last_name, email, phone, password, event_id):
-        user = User(first_name=first_name, last_name=last_name, email=email)
+    def create(cls, username, first_name, last_name, email, phone, password, event_id):
+        user = User(username=username, first_name=first_name, last_name=last_name, email=email)
         user.password = make_password(password)
         user.save()
         user.groups.add(Group.objects.filter(name=EventVolunteer.GROUP_NAME))
-        v = cls(user=user, phone=phone, created_by=current_user)
+        v = cls(user=user, phone=phone)
         v.event_id = event_id
         v.save()
 
@@ -63,8 +80,8 @@ class RituAdmin(Volunteer):
         return self.user.username
 
     @classmethod
-    def create(cls, current_user, first_name, last_name, email, phone, password):
-        r = Volunteer.create(current_user, first_name, last_name, email, phone, cls.GROUP_NAME)
+    def create(cls, username, first_name, last_name, email, phone, password):
+        r = Volunteer.create(username, first_name, last_name, email, phone, cls.GROUP_NAME)
 
 
 class RegistrationDesk(Volunteer):
@@ -77,8 +94,8 @@ class RegistrationDesk(Volunteer):
         return self.user.username
 
     @classmethod
-    def create(cls, current_user, first_name, last_name, email, phone, password):
-        r = Volunteer.create(current_user, first_name, last_name, email, phone, cls.GROUP_NAME)
+    def create(cls, username, first_name, last_name, email, phone, password):
+        r = Volunteer.create(username, first_name, last_name, email, phone, cls.GROUP_NAME)
 
 
 class Head(Volunteer):
@@ -91,8 +108,8 @@ class Head(Volunteer):
         return self.user.username
 
     @classmethod
-    def create(cls, current_user, first_name, last_name, email, phone, password):
-        r = Volunteer.create(current_user, first_name, last_name, email, phone, cls.GROUP_NAME)
+    def create(cls, username, first_name, last_name, email, phone, password):
+        r = Volunteer.create(username, first_name, last_name, email, phone, cls.GROUP_NAME)
 
 
 class Organizer(models.Model):
