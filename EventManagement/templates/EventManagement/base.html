@@ -19,6 +19,36 @@
     {% block nav-icons %}
     {% endblock %}
 </nav>
+{#Event view#}
+<div class="event-list">
+    <form action="" id="search-dept">
+        <input type="search" placeholder="Enter name of Department or Event to search" id="search_dept">
+    </form>
+    <table class="table table-hover event-table">
+      <thead>
+        <tr>
+            <th scope="col">Event Name</th>
+            <th scope="col">Department</th>
+            <th scope="col">Timing</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Venue</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for event in event_list %}
+        <tr>
+            <td scope="row">{{ event.name }}</td>
+            <td>{{ event.organizer }}</td>
+            <td>{{ event.timing }}</td>
+            <td>{{ event.amount }}</td>
+            <td>{{ event.venue }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+
+</div>
 {% block body %}
 {% endblock %}
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>

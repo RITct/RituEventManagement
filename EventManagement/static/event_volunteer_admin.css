@@ -182,3 +182,7 @@ margin-top: 0;
     width: 50%;
     float: right;
 }
+/*Error list*/
+.errorlist{
+    background: coral;
+}

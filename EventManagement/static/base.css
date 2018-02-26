@@ -44,3 +44,20 @@ input[type=submit]{
     border-radius: 10px;
     color: white;
 }
+/*table*/
+thead{
+    background: cadetblue;
+}
+/*search - ept*/
+#search-dept{
+    position: fixed;
+    top: 7%;
+    width: 100%;
+    color: white;
+    text-align: center;
+    background-color: #FBC02D;
+}
+.event-list{
+        margin-top: 5%;
+    display: none;
+}
