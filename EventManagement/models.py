@@ -91,10 +91,9 @@ class Event(models.Model):
     code = models.CharField(max_length=10, unique=True)
     organizer = models.ForeignKey(Organizer, on_delete=models.CASCADE)
     timing = models.DateTimeField(null=True)
-    is_team_event = models.BooleanField(default=False)
-    max_members = models.IntegerField(null=True)
     additional_data = models.TextField()
     amount = models.CharField(max_length=10, null=True)
+    is_team_event = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -106,18 +105,24 @@ class Workshop(models.Model):
     organizer = models.ForeignKey(Organizer, on_delete=models.CASCADE, null=True)
     timing = models.DateTimeField(null=True)
     amount = models.CharField(max_length=10, null=True)
+    is_team_event = models.BooleanField(default=False)
 
 
-class TeamRegistration(models.Model):
-    team_name = models.CharField(max_length=250)
+class WorkshopRegistration(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE)
+    additional_data = models.TextField()
+    registrar = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        unique_together = (('profile', 'workshop'),)
 
 
 class Registration(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    team = models.ForeignKey(TeamRegistration, on_delete=models.SET_NULL, null=True)
-
-    registrar = models.ForeignKey(RegistrationDesk, on_delete=models.SET_NULL, null=True)
+    additional_data = models.TextField(null=True)
+    registrar = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     class Meta:
-        unique_together = (('profile', 'event'), ('profile', 'team'))
+        unique_together = (('profile', 'event'),)
