@@ -95,24 +95,56 @@ def get_event_data(request):
     event_details = Event.objects.all()
     workshop_details = Workshop.objects.all()
     data = {
-        'events':{},
-        'workshops':{}
+        'events':[],
+        'workshops':[]
     }
     for event in event_details:
-        data['events'][event.code] = {
+        data['events'].append({
+            "code":event.code,
             'name':event.name,
             'time': event.timing,
             'organiser':event.organizer.name,
             'amount':event.amount,
             'additional':event.additional_data,
-            'is_team':event.is_team_event
-        }
+            'is_team':event.is_team_event,
+            'venue':event.venue,
+        })
     for event in workshop_details:
-        data['workshops'][event.code] = {
+        data['workshops'].append({
+            "code":event.code,
             'name': event.name,
             'time': event.timing,
             'organiser': event.organizer.name if event.organizer is not None else "",
             'amount': event.amount,
-            'is_team': event.is_team_event
-        }
+            'is_team': event.is_team_event,
+            "venue":event.venue
+        })
     return JsonResponse(data=data)
+
+
+def get_user_data(request):
+    data = {
+        'name':"test",
+        'college':"RIT",
+        'phone':'999999999',
+        'email':'test@test.com',
+        'registrations': {
+            'events': [
+                {
+                    'code':"CSE01",
+                },
+                {
+                    'code':"CSE02"
+                }
+            ],
+            'workshops':[
+                {
+                    'code':"CSEW01",
+                },
+                {
+                    'code':"CSEW02"
+                }
+            ]
+        }
+    }
+    return JsonResponse(data)

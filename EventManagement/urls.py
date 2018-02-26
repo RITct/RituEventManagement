@@ -8,5 +8,6 @@ urlpatterns = [
     path('add/profile',views.add_profile, name="add_profile"),
 
 
-    path('api/get/event/data', views.get_event_data, name="get_event_data")
+    path('api/get/event/data', views.get_event_data, name="get_event_data"),
+    path('api/get/user/data', views.get_user_data, name="get_user_data"),
 ]

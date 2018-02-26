@@ -112,6 +112,7 @@ class Event(models.Model):
     additional_data = models.TextField()
     amount = models.CharField(max_length=10, null=True)
     is_team_event = models.BooleanField(default=False)
+    venue = models.CharField(max_length=500)
 
     def __str__(self):
         return self.name
@@ -124,6 +125,8 @@ class Workshop(models.Model):
     timing = models.DateTimeField(null=True)
     amount = models.CharField(max_length=10, null=True)
     is_team_event = models.BooleanField(default=False)
+    venue = models.CharField(max_length=500)
+
 
     def __str__(self):
         return self.name
