@@ -6,14 +6,14 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.http import require_http_methods
 
-from EventManagement.forms import AddEventVolunteerForm
+from EventManagement.forms import AddEventVolunteerForm, ProfileForm
 from EventManagement.utils import belongs_to_group, group_login_required
 from EventManagement.models import *
 
 
 def index(request):
     if request.user is not None:
-        return redirect('')
+        return redirect('admin')
     return render(request, 'EventManagement/sign_in.html')
 
 
@@ -35,12 +35,32 @@ def admin_panel(request):
     else:
         raise PermissionDenied("Not a authorized to view the page")
 
-@require_http_methods(["POST"])
-@group_login_required(group_name=Head.GROUP_NAME)
+
+#@require_http_methods(["POST"])
+#@group_login_required(group_name=Head.GROUP_NAME)
 def head_event_volunteer_add(request):
     form = AddEventVolunteerForm(request.POST)
+    head = Head.objects.filter(user=request.user).select_related().first()
     if form.is_valid():
-        EventVolunteer.create(request.user,
-                              form.cleaned_data['first_name'],
-                              form.cleaned_data[''] #TODO
-                              )
+        event_volunteer = EventVolunteer.create(current_user=request.user,
+                                                first_name=form.cleaned_data['first_name'],
+                                                last_name=form.cleaned_data['last_name'],
+                                                email=form.cleaned_data['email'],
+                                                phone=form.cleaned_data['phone'],
+                                                password=form.cleaned_data['password'],
+                                                event_id=form.cleaned_data['event']
+                                                )
+        return redirect('admin')
+    return render(request, "EventManagement/head_admin.html", {'form': form})
+
+
+# @require_http_methods(["POST"])
+# @group_login_required(group_name=Head.GROUP_NAME)
+def add_profile(request):
+    form = ProfileForm(request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect('admin')
+    return render(request, "EventManagement/head_admin.html", {'form': form})
+
+

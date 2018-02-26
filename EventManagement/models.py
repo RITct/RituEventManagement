@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User, Group
 from django.db import models
 
@@ -18,14 +19,14 @@ class Volunteer(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='creator')
 
     @staticmethod
-    def create(current_user, first_name,last_name,email,phone, group_name=None):
+    def create(current_user, first_name, last_name, email, phone, password, group_name=None):
         user = User(first_name=first_name, last_name=last_name, email=email)
+        user.password = make_password(password)
         user.save()
         user.groups.add(Group.objects.filter(name=group_name))
-        v = Volunteer(user=user, phone=phone,created_by=current_user)
+        v = Volunteer(user=user, phone=phone, created_by=current_user)
         v.save()
         return v
-
 
 
 class EventVolunteer(Volunteer):
@@ -33,13 +34,15 @@ class EventVolunteer(Volunteer):
     event = models.ForeignKey('Event', on_delete=models.CASCADE)
 
     @classmethod
-    def create(cls, current_user, first_name, last_name, email, phone, event):
+    def create(cls, current_user, first_name, last_name, email, phone, password, event_id):
         user = User(first_name=first_name, last_name=last_name, email=email)
+        user.password = make_password(password)
         user.save()
         user.groups.add(Group.objects.filter(name=EventVolunteer.GROUP_NAME))
         v = cls(user=user, phone=phone, created_by=current_user)
-        v.event = event
+        v.event_id = event_id
         v.save()
+
 
 class RituAdmin(Volunteer):
     GROUP_NAME = "admin_"
@@ -48,8 +51,9 @@ class RituAdmin(Volunteer):
         proxy = True
 
     @classmethod
-    def create(cls,current_user, first_name,last_name,email,phone):
-        r = Volunteer.create(current_user,first_name,last_name,email,phone,cls.GROUP_NAME)
+    def create(cls, current_user, first_name, last_name, email, phone, password):
+        r = Volunteer.create(current_user, first_name, last_name, email, phone, cls.GROUP_NAME)
+
 
 class RegistrationDesk(Volunteer):
     GROUP_NAME = "registration_desk"
@@ -58,8 +62,9 @@ class RegistrationDesk(Volunteer):
         proxy = True
 
     @classmethod
-    def create(cls, current_user, first_name, last_name, email, phone):
+    def create(cls, current_user, first_name, last_name, email, phone, password):
         r = Volunteer.create(current_user, first_name, last_name, email, phone, cls.GROUP_NAME)
+
 
 class Head(Volunteer):
     GROUP_NAME = "dept_head"
@@ -68,7 +73,7 @@ class Head(Volunteer):
         proxy = True
 
     @classmethod
-    def create(cls, current_user, first_name, last_name, email, phone):
+    def create(cls, current_user, first_name, last_name, email, phone, password):
         r = Volunteer.create(current_user, first_name, last_name, email, phone, cls.GROUP_NAME)
 
 
@@ -90,7 +95,6 @@ class Event(models.Model):
     max_members = models.IntegerField(null=True)
     additional_data = models.TextField()
     amount = models.CharField(max_length=10, null=True)
-
 
     def __str__(self):
         return self.name

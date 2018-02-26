@@ -6,6 +6,7 @@ from EventManagement.models import Profile, Event
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
+        fields = "__all__"
 
 
 class AddEventVolunteerForm(forms.Form):
@@ -14,6 +15,7 @@ class AddEventVolunteerForm(forms.Form):
         self.fields['event'].query_set = Event.objects.filter(organizer=organizer)
 
     first_name = forms.CharField()
+    last_name = forms.CharField()
     email = forms.CharField()
     password = forms.CharField()
     phone = forms.CharField()
