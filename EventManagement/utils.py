@@ -14,10 +14,10 @@ def belongs_to_group(user, group_name):
 def group_login_required(group_name):
     def real_decorator(function):
         @login_required
-        def wrapper(request, *args):
+        def wrapper(request):
             if not belongs_to_group(request.user, group_name):
                 raise PermissionDenied()
-            return function(request,args)
+            return function(request)
 
         return wrapper
     return real_decorator
