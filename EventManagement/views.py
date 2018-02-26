@@ -2,13 +2,14 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
+from django.views import View
 from django.views.decorators.http import require_http_methods
 
 from EventManagement.celery import send_email
-from EventManagement.forms import AddEventVolunteerForm, ProfileForm
+from EventManagement.forms import ProfileForm, EventForm
 from EventManagement.utils import belongs_to_group, group_login_required
 from EventManagement.models import *
 
@@ -26,10 +27,8 @@ def logout_user(request):
 
 @login_required
 def admin_panel(request):
-    context = {'event_list': Event.objects.all(), 'workshop_list': Workshop.objects.all()}
-    if belongs_to_group(request.user, Volunteer.GROUP_NAME):
-        return render(request, 'EventManagement/volunteer_admin.html', context)
-    elif belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
+    context = {'event_list': Event.objects.all(), 'workshop_list': Workshop.objects.all(), 'user':request.user}
+    if belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
         event_volunteer = EventVolunteer.objects.get(user=request.user)
         context['event_volunteer'] = event_volunteer
         return render(request, 'EventManagement/event_volunteer_admin.html', context)
@@ -38,9 +37,6 @@ def admin_panel(request):
         context['event_volunteer'] = event_volunteer
         context['p_form'] = ProfileForm()
         return render(request, 'EventManagement/event_volunteer_admin.html', context)
-    elif belongs_to_group(request.user, Head.GROUP_NAME):
-        context['head'] = Head.objects.get(user=request.user)
-        return render(request, "EventManagement/head_admin.html", context)
     elif belongs_to_group(request.user, RituAdmin.GROUP_NAME):
         context['admin'] = RituAdmin.objects.get(user=request.user)
         return render(request, "EventManagement/ritu_admin_admin.html", context)
@@ -53,7 +49,7 @@ def admin_panel(request):
 def add_profile(request):
     print('')
     form = ProfileForm(request.POST)
-    context={'event_list':[], 'workshop_list':[]}
+    context = {'event_list': [], 'workshop_list': []}
     if form.is_valid():
         profile = form.save()
         events = Event.objects.all()
@@ -78,12 +74,28 @@ def add_profile(request):
                     r.additional_data = request.POST[event.code + "_additional"]
                 r.save()
                 context['workshop_list'].append(workshop.name)
-        send_email.delay(profile.serialize,context)
+        send_email.delay(profile.serialize, context)
         return redirect('admin_panel')
     print(form.errors)
     return render(request, "EventManagement/event_volunteer_admin.html", {'p_form': form,
                                                                           'event_list': Event.objects.all(),
                                                                           'workshop_list': Workshop.objects.all()})
+
+
+class UpdateEvent(View):
+    @group_login_required(group_name=EventVolunteer.GROUP_NAME)
+    def get(self, request, event_code):
+        event = get_object_or_404(Event, code=event_code)
+        form = EventForm(instance=event)
+        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user})
+
+    @group_login_required(group_name=EventVolunteer.GROUP_NAME)
+    def post(self, request):
+        form = EventForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user})
 
 
 #####################################################
