@@ -147,7 +147,7 @@ class UpdateEvent(View):
         if event.organizer != event_v.organizer:
             raise PermissionDenied()
         form = EventForm(instance=event)
-        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user})
+        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user, 'slug':event_code})
 
     def post(self, request, event_code):
         if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
