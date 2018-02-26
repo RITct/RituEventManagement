@@ -32,18 +32,32 @@ def admin_panel(request):
         event_volunteer = EventVolunteer.objects.get(user=request.user)
         context['event_volunteer'] = event_volunteer
         org_events = Event.objects.filter(organizer=event_volunteer.organizer)
-        context['registrations'] = []
+        context['event_registrations'] = []
         for i, event in enumerate(org_events):
-            context['registrations'].append({
+            context['event_registrations'].append({
                 'code': event.code,
                 'name': event.name,
                 'list': []
             })
             registrations = Registration.objects.filter(event=event)
             for reg in registrations:
-                context['registrations'][i]['list'].append({
+                context['event_registrations'][i]['list'].append({
                     'profile': reg.profile.serialize,
-                    'additonal_data': reg.additional_data,
+                    'additional_data': reg.additional_data,
+                })
+        org_workshops = Workshop.objects.filter(organizer=event_volunteer.organizer)
+        context['workshop_registrations'] = []
+        for i, event in enumerate(org_workshops):
+            context['workshop_registrations'].append({
+                'code': event.code,
+                'name': event.name,
+                'list': []
+            })
+            registrations = Registration.objects.filter(event=event)
+            for reg in registrations:
+                context['workshop_registrations'][i]['list'].append({
+                    'profile': reg.profile.serialize,
+                    'additional_data': reg.additional_data,
                 })
         return render(request, 'EventManagement/event_volunteer_admin.html', context)
     elif belongs_to_group(request.user, RegistrationDesk.GROUP_NAME):
@@ -53,7 +67,34 @@ def admin_panel(request):
         return render(request, 'EventManagement/event_volunteer_admin.html', context)
     elif belongs_to_group(request.user, RituAdmin.GROUP_NAME):
         context['admin'] = RituAdmin.objects.get(user=request.user)
-
+        org_events = Event.objects.all()
+        context['event_registrations'] = []
+        for i, event in enumerate(org_events):
+            context['event_registrations'].append({
+                'code': event.code,
+                'name': event.name,
+                'list': []
+            })
+            registrations = Registration.objects.filter(event=event)
+            for reg in registrations:
+                context['event_registrations'][i]['list'].append({
+                    'profile': reg.profile.serialize,
+                    'additional_data': reg.additional_data,
+                })
+        org_workshops = Workshop.objects.all()
+        context['workshop_registrations'] = []
+        for i, event in enumerate(org_workshops):
+            context['workshop_registrations'].append({
+                'code': event.code,
+                'name': event.name,
+                'list': []
+            })
+            registrations = Registration.objects.filter(event=event)
+            for reg in registrations:
+                context['workshop_registrations'][i]['list'].append({
+                    'profile': reg.profile.serialize,
+                    'additional_data': reg.additional_data,
+                })
         return render(request, "EventManagement/ritu_admin_admin.html", context)
     else:
         raise PermissionDenied("Not a authorized to view the page")
