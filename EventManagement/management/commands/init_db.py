@@ -45,5 +45,4 @@ class Command(BaseCommand):
         Group(name=Volunteer.GROUP_NAME).save()
         Group(name=EventVolunteer.GROUP_NAME).save()
         Group(name=RegistrationDesk.GROUP_NAME).save()
-        Group(name=Head.GROUP_NAME).save()
         Group(name=RituAdmin.GROUP_NAME).save()
