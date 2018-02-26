@@ -11,12 +11,18 @@ class Profile(models.Model):
     phone = models.CharField(max_length=15)
     college = models.CharField(max_length=500)
 
+    def __str__(self):
+        return self.name
+
 
 class Volunteer(models.Model):
     GROUP_NAME = "volunteer"
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=15)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='creator')
+
+    def __str__(self):
+        return self.user.username
 
     @staticmethod
     def create(current_user, first_name, last_name, email, phone, password, group_name=None):
@@ -32,6 +38,9 @@ class Volunteer(models.Model):
 class EventVolunteer(Volunteer):
     GROUP_NAME = "event_volunteer"
     event = models.ForeignKey('Event', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.user.username
 
     @classmethod
     def create(cls, current_user, first_name, last_name, email, phone, password, event_id):
@@ -50,6 +59,9 @@ class RituAdmin(Volunteer):
     class Meta:
         proxy = True
 
+    def __str__(self):
+        return self.user.username
+
     @classmethod
     def create(cls, current_user, first_name, last_name, email, phone, password):
         r = Volunteer.create(current_user, first_name, last_name, email, phone, cls.GROUP_NAME)
@@ -61,6 +73,9 @@ class RegistrationDesk(Volunteer):
     class Meta:
         proxy = True
 
+    def __str__(self):
+        return self.user.username
+
     @classmethod
     def create(cls, current_user, first_name, last_name, email, phone, password):
         r = Volunteer.create(current_user, first_name, last_name, email, phone, cls.GROUP_NAME)
@@ -71,6 +86,9 @@ class Head(Volunteer):
 
     class Meta:
         proxy = True
+
+    def __str__(self):
+        return self.user.username
 
     @classmethod
     def create(cls, current_user, first_name, last_name, email, phone, password):
@@ -107,6 +125,9 @@ class Workshop(models.Model):
     amount = models.CharField(max_length=10, null=True)
     is_team_event = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.name
+
 
 class WorkshopRegistration(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -117,6 +138,9 @@ class WorkshopRegistration(models.Model):
     class Meta:
         unique_together = (('profile', 'workshop'),)
 
+    def __str__(self):
+        return self.profile.name + " | " + self.additional_data
+
 
 class Registration(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -126,3 +150,6 @@ class Registration(models.Model):
 
     class Meta:
         unique_together = (('profile', 'event'),)
+
+    def __str__(self):
+        return str(self.profile) + " | " + str(self.event) + ( " | " + self.additional_data if self.additional_data is not None else "")
