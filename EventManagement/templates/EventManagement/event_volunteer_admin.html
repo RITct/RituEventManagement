@@ -25,6 +25,7 @@
 {% endblock %}
 
 {% block body %}
+            {{ p_form.errors }}
     <div class="container">
     <div class="form">
         <h3>Add student and associate events.</h3>
@@ -44,8 +45,8 @@
                         {% for event in event_list %}
                             <div class="item">
                                 <div class="roundedOne">
-                                    <input type="checkbox" name="{{ event.code }}" value="{{ event.name }}" id="{{ event.code }}" />
-                                    <label for="{{ event.code }}"></label>
+                                    <input type="checkbox" name="{{ event.code }}" value="{{ event.name }}" id="{{ event.name }}" />
+                                    <label for="{{ event.name }}"></label>
                                 </div>
                                 <span>{{ event.name }}</span>
                             </div>
@@ -61,8 +62,8 @@
                 {% for workshop in workshop_list %}
                     <div class="item">
                         <div class="roundedOne">
-                            <input type="checkbox" name="{{ workshop.code }}" value="{{ workshop.code }}" id="{{ workshop.code }}" />
-                            <label for="{{ workshop.code }}"></label>
+                            <input type="checkbox" name="{{ workshop.code }}" value="{{ workshop.code }}" id="{{ workshop.name }}" />
+                            <label for="{{ workshop.name }}"></label>
                         </div>
                     <span>{{ workshop.name }}</span>
                     </div>
@@ -101,13 +102,14 @@
                     </div>
               </div>
               <div class="modal-footer">
-                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button class="btn btn-secondary" id="close-btn" data-dismiss="modal">Close</button>
                   <button type="button" class="btn btn-primary" id="submit-success">Go</button>
               </div>
             </div>
           </div>
         </div>
     </div>
+
 {% endblock %}
 {% block script %}
     <script>
@@ -150,18 +152,19 @@
             $('#email-confirm').text($('#id_email').val());
             $('#phone-confirm').text($('#id_phone').val());
             $('#college-confirm').text($('#id_college').val());
+            $('#event-confirm').text("");
             var elem = $("input[type=checkbox]");
             elem.each(function () {
                 if($(this)[0].checked){
-                    console.log($(this));
-                    console.log($(this)[0].defaultValue);
-                    $('#event-confirm').append($(this)[0].defaultValue + "<br>");
+{#                    console.log($(this));#}
+{#                    console.log($(this)[0].defaultValue);#}
+                    $('#event-confirm').append($(this)[0].id + "<br>");
                 }
             });
         });
         $('#submit-success').click(function () {
             document.getElementById("form").submit();
             console.log("dfsd");
-        })
+        });
     </script>
 {% endblock %}
