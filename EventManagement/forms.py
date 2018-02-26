@@ -9,12 +9,6 @@ class ProfileForm(forms.ModelForm):
         fields = "__all__"
 
 
-class EventRegForm(forms.Form):
-    events = forms.ModelMultipleChoiceField(queryset=Event.objects.all().select_related().order_by('organizer'))
-    workshops = forms.ModelMultipleChoiceField(queryset=Workshop.objects.all().select_related().order_by('organizer'))
-    additional_data = forms.CharField(widget=forms.Textarea,required=False)
-
-
 class AddEventVolunteerForm(forms.Form):
     def __init__(self, organizer, *args, **kwargs):
         super().__init__(args, kwargs)

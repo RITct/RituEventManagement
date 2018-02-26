@@ -1,6 +1,12 @@
 <form action="{% url 'add_profile' %}" method="post">
     {% csrf_token %}
     {{ p_form }}
-    {{ reg_form }}
+    {% for event in event_list %}
+        <input type="checkbox" name="{{ event.code }}" value="{{ event.code }}">{{ event.name }}<br>
+    {% endfor %}
+    <h1> Workshops </h1>
+    {% for workshop in workshop_list %}
+        <input type="checkbox" name="{{ workshop.code }}" value="{{ workshop.code }}">{{ workshop.name }}<br>
+    {% endfor %}
     <input type="submit">
 </form>

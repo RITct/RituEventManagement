@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.views.decorators.http import require_http_methods
 
-from EventManagement.forms import AddEventVolunteerForm, ProfileForm, EventRegForm
+from EventManagement.forms import AddEventVolunteerForm, ProfileForm
 from EventManagement.utils import belongs_to_group, group_login_required
 from EventManagement.models import *
 
@@ -30,7 +30,6 @@ def admin_panel(request):
         event_volunteer = RegistrationDesk.objects.get(user=request.user)
         context['event_volunteer'] = event_volunteer
         context['p_form'] = ProfileForm()
-        context['reg_form'] = EventRegForm()
         return render(request, 'EventManagement/event_volunteer_admin.html', context)
     elif belongs_to_group(request.user, Head.GROUP_NAME):
         context['head'] = Head.objects.get(user=request.user)
@@ -61,30 +60,34 @@ def head_event_volunteer_add(request):
 
 
 @require_http_methods(["POST"])
-@group_login_required(group_name=Head.GROUP_NAME)
+@group_login_required(group_name=RegistrationDesk.GROUP_NAME)
 def add_profile(request):
     form = ProfileForm(request.POST)
-    reg_form = EventRegForm(request.POST)
     if form.is_valid():
         profile = form.save()
-        if reg_form.is_valid():
-            events = reg_form.cleaned_data['events']
-            workshops = reg_form.cleaned_data['workshops']
-            for event in events:
+        events = Event.objects.all()
+        for event in events:
+            if event.code in request.POST:
                 r = Registration()
-                r.profile = profile
                 r.event = event
-                r.additional_data = reg_form.cleaned_data['additional_data'] if event.is_team_event else None
                 r.registrar = request.user
-                r.save()
-            for event in workshops:
-                r = WorkshopRegistration()
                 r.profile = profile
-                r.workshop = event
-                r.additional_data = reg_form.cleaned_data['additional_data'] if event.is_team_event else None
-                r.registrar = request.user
+                if event.is_team_event:
+                    r.additional_data = request.POST[event.code+"_additional"]
                 r.save()
-            return redirect('admin_panel')
-    return render(request, "EventManagement/event_volunteer_admin.html", {'p_form': form, 'reg_form':reg_form})
+        workshops = Workshop.objects.all()
+        for workshop in workshops:
+            if workshop.code in request.POST:
+                r = WorkshopRegistration()
+                r.workshop = workshop
+                r.registrar = request.user
+                r.profile = profile
+                if event.is_team_event:
+                    r.additional_data = request.POST[event.code+"_additional"]
+                r.save()
+        return redirect('admin_panel')
+    return render(request, "EventManagement/event_volunteer_admin.html", {'p_form': form,
+                                                                          'event_list': Event.objects.all(),
+                                                                          'workshop_list': Workshop.objects.all()})
 
 
