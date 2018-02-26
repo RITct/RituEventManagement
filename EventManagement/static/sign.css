@@ -1,0 +1,43 @@
+.container{
+    padding: 5% 10%;
+}
+a , a:hover{
+    text-decoration: none;
+}
+.form{
+    padding: 5% 10%;
+    border-radius: 10px;
+    box-shadow: 0 0 1px #0000008c;
+}
+.form h3{
+    padding: 4%;
+    background-color: lightblue;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.form form{
+    padding: 4%;
+}
+.form input[type=submit] , button ,input[type=button] {
+    width: 50%;
+    border: none;
+    border-bottom: 2px solid #8080804d;
+    display: block;
+    margin: auto;
+    padding: 2%;
+    border-radius: 5px;
+    margin-top: 5%;
+    outline: none;
+    cursor: pointer;
+    background-color: dodgerblue;
+    color: white;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+.form h4{
+    padding-bottom: 7.5%;
+}
+/*Error list*/
+.errorlist{
+    background: coral;
+}

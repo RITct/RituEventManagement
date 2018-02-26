@@ -1,0 +1,25 @@
+{% extends 'EventManagement/base.html' %}
+{% load static %}
+{% block link %}
+    <link rel="stylesheet" href="{% static 'update_event.css' %}">
+{% endblock %}
+{% block nav-icons %}
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   Welcome {{ user.username }}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {{ form }}
+    </div>
+{% endblock %}

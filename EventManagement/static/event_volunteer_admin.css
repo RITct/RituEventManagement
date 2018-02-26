@@ -169,6 +169,13 @@ margin-top: 0;
     padding: 2% 7%;
     width: 100%
 }
+.event-names , .workshop-names{
+    width: 100%;
+    margin: 0;
+    padding: 8px 0;
+    cursor: pointer;
+
+}
 /*model*/
 .modal-dialog{
     width: 50vw !important;

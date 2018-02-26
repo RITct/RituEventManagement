@@ -17,7 +17,7 @@
                    Welcome {{ event_volunteer.user.username }}
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Logout</a>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                 </div>
             </li>
         </ul>
@@ -48,7 +48,7 @@
                                     <input type="checkbox" name="{{ event.code }}" value="{{ event.name }}" id="{{ event.name }}" />
                                     <label for="{{ event.name }}"></label>
                                 </div>
-                                <span>{{ event.name }}</span>
+                                <label class="event-names" for="{{ event.name }}"><span>{{ event.name }}</span></label>
                             </div>
                         {% endfor %}
                     </div>
@@ -65,7 +65,7 @@
                             <input type="checkbox" name="{{ workshop.code }}" value="{{ workshop.code }}" id="{{ workshop.name }}" />
                             <label for="{{ workshop.name }}"></label>
                         </div>
-                    <span>{{ workshop.name }}</span>
+                    <label class="workshop-names" for="{{ workshop.name }}"><span>{{ workshop.name }}</span></label>
                     </div>
                 {% endfor %}
                 </div>
