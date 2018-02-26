@@ -20,7 +20,7 @@ class ProfileAdmin(admin.ModelAdmin):
 admin.site.register(Organizer)
 admin.site.register(Event)
 admin.site.register(RituAdmin)
-admin.site.register(Head)
+# admin.site.register(Head)
 admin.site.register(RegistrationDesk)
 admin.site.register(EventVolunteer)
 admin.site.register(Volunteer)
