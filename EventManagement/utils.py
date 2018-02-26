@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import render
+from django.template.loader import render_to_string
 
 from EventManagement.models import *
 
