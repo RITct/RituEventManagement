@@ -25,6 +25,7 @@ def debug_task(self):
 
 @app.task
 def send_email(profile, context):
+    context['profile'] = profile
     image_url = str(profile['id_code'])
     qr = pyqrcode.create(profile['id_code'])
     qr.png(image_url, scale=10)
