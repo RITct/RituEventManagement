@@ -59,12 +59,12 @@ def admin_panel(request):
                     'profile': reg.profile.serialize,
                     'additional_data': reg.additional_data,
                 })
-        return render(request, 'EventManagement/event_volunteer_admin.html', context)
+        return render(request, 'EventManagement/event_volunteer.html', context)
     elif belongs_to_group(request.user, RegistrationDesk.GROUP_NAME):
         event_volunteer = RegistrationDesk.objects.get(user=request.user)
         context['event_volunteer'] = event_volunteer
         context['p_form'] = ProfileForm()
-        return render(request, 'EventManagement/event_volunteer_admin.html', context)
+        return render(request, 'EventManagement/registration_admin.html', context)
     elif belongs_to_group(request.user, RituAdmin.GROUP_NAME):
         context['admin'] = RituAdmin.objects.get(user=request.user)
         org_events = Event.objects.all()
@@ -133,7 +133,7 @@ def add_profile(request):
         send_email.delay(profile.serialize, context)
         return redirect('admin_panel')
     print(form.errors)
-    return render(request, "EventManagement/event_volunteer_admin.html", {'p_form': form,
+    return render(request, "EventManagement/registration_admin.html", {'p_form': form,
                                                                           'event_list': Event.objects.all(),
                                                                           'workshop_list': Workshop.objects.all()})
 
@@ -142,7 +142,10 @@ class UpdateEvent(View):
     def get(self, request, event_code):
         if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
             raise PermissionDenied()
+        event_v = EventVolunteer.objects.get(user=request.user)
         event = get_object_or_404(Event, code=event_code)
+        if event.organizer != event_v.organizer:
+            raise PermissionDenied()
         form = EventForm(instance=event)
         return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user})
 
