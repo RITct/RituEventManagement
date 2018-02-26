@@ -142,7 +142,10 @@ class UpdateEvent(View):
     def get(self, request, event_code):
         if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
             raise PermissionDenied()
+        event_v = EventVolunteer.objects.get(user=request.user)
         event = get_object_or_404(Event, code=event_code)
+        if event.organizer != event_v.organizer:
+            raise PermissionDenied()
         form = EventForm(instance=event)
         return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user})
 
