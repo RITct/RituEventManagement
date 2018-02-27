@@ -15,3 +15,6 @@ button.btn a{
 .card-header{
     cursor: pointer;
 }
+.card-body table{
+    margin-top: 0!important;
+}

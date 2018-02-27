@@ -25,8 +25,8 @@
 {% endblock %}
 
 {% block body %}
-            {{ p_form.errors }}
     <div class="container">
+                {{ p_form.errors }}
     <div class="form">
         <h3>Add student and associate events.</h3>
         <form action="{% url 'add_profile' %}" name="form" id="form" method="post">
