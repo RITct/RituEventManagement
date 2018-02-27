@@ -105,7 +105,33 @@ def admin_panel(request):
 def add_profile(request):
     print('')
     form = ProfileForm(request.POST)
+    addition_info = request.POST["additional_info"]
     context = {'event_list': [], 'workshop_list': []}
+    if Profile.objects.filter(phone=form.data['phone']).exists():
+        profile = Profile.objects.filter(phone=form.data['phone']).first()
+        events = Event.objects.all()
+        for event in events:
+            if event.code in request.POST:
+                r = Registration()
+                r.event = event
+                r.registrar = request.user
+                r.profile = profile
+                if event.is_team_event:
+                    r.additional_data = addition_info
+                r.save()
+                context['event_list'].append(event.name)
+        workshops = Workshop.objects.all()
+        for workshop in workshops:
+            if workshop.code in request.POST:
+                r = WorkshopRegistration()
+                r.workshop = workshop
+                r.registrar = request.user
+                r.profile = profile
+                if event.is_team_event:
+                    r.additional_data = request.POST[event.code + "_additional"]
+                r.save()
+                context['workshop_list'].append(workshop.name)
+        return redirect('admin_panel')
     if form.is_valid():
         profile = form.save()
         events = Event.objects.all()
@@ -116,7 +142,7 @@ def add_profile(request):
                 r.registrar = request.user
                 r.profile = profile
                 if event.is_team_event:
-                    r.additional_data = request.POST[event.code + "_additional"]
+                    r.additional_data = addition_info
                 r.save()
                 context['event_list'].append(event.name)
         workshops = Workshop.objects.all()
@@ -132,8 +158,13 @@ def add_profile(request):
                 context['workshop_list'].append(workshop.name)
         send_email.delay(profile.serialize, context)
         return redirect('admin_panel')
-    print(form.errors)
+    print(form.data['name'])
     return render(request, "EventManagement/registration_admin.html", {'p_form': form,
+                                                                       'name':form.data['name'],
+                                                                       'phone':form.data['phone'],
+                                                                       'college':form.data['college'],
+                                                                       'email':form.data['email'],
+                                                                       'additional_info': addition_info,
                                                                           'event_list': Event.objects.all(),
                                                                           'workshop_list': Workshop.objects.all()})
 
@@ -214,24 +245,6 @@ def get_user_data(request):
         },
         'status':'ok'
     }
-        # 'registrations': {
-        #     'events': [
-        #         {
-        #             'code': "CSE01",
-        #         },
-        #         {
-        #             'code': "CSE02"
-        #         }
-        #     ],
-        #     'workshops': [
-        #         {
-        #             'code': "CSEW01",
-        #         },
-        #         {
-        #             'code': "CSEW02"
-        #         }
-        #     ]
-        # }
     for registration in list(profile.registration_set.all()):
         data['regtistration']['events'].append({'code':registration.event.code})
     for registration in list(profile.workshopregistration_set.all()):

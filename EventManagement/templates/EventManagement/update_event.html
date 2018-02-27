@@ -28,7 +28,7 @@
         {% csrf_token %}
         <span>Event Name : </span><input type="text" name="name" value="{{ form.instance.name }}" maxlength="255" required="" disabled id="id_name">
         <span>Timing : </span><input type="text" name="timing" value="{{ form.instance.timing }}" maxlength="250" required="" id="id_timing">
-        <span>Additional Info : </span><textarea name="additional_data" cols="70" rows="2" id="id_additional_data" placeholder="Eg: Event venue changed or Event prelims will start exactly at 11 etc."></textarea>
+        <span>Additional Info : </span><textarea name="additional_data" cols="70" rows="2" id="id_additional_data" placeholder="Eg: Event venue changed or Event prelims will start exactly at 11 etc.">{{ form.instance.additional_data }}</textarea>
         <span>Amount : </span><input type="text" name="amount" value="{{ form.instance.amount }}" maxlength="10" required=""  disabled id="id_amount">
         <span>Team Event? : <input type="checkbox" name="is_team_event" id="id_is_team_event"></span>
         <span>Enter Venue : </span><input type="text" name="venue" value="{{ form.instance.venue }}" maxlength="500" required="" id="id_venue" placeholder="Venue">
