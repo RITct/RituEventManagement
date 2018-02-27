@@ -100,6 +100,12 @@ form input[type=checkbox]{
 .roundedOne input[type=checkbox]:checked + label:after {  opacity: 1;
  }
 /*Events list*/
+.event-list table{
+    margin-top: 8.8%;
+}
+.event-list{
+    display: none;
+}
 .event::-webkit-scrollbar ,.workshop::-webkit-scrollbar {
     width: 1em;
 }

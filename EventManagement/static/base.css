@@ -45,6 +45,9 @@ input[type=submit]{
     color: white;
 }
 /*table*/
+.table{
+    margin-top:8.3%;
+}
 thead{
     background: cadetblue;
 }

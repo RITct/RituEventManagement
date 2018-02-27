@@ -1,6 +1,13 @@
 .container{
     padding: 5%;
 }
+.dropdown{
+    position: relative!important;
+}
+.navbar-nav{
+    position: absolute;
+    right: 0;
+}
 button.btn a{
     right: 20px;
     position: absolute;

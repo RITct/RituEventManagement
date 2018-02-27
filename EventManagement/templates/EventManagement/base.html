@@ -21,7 +21,7 @@
 </nav>
 {#Event view#}
 <div class="event-list">
-    <form action="" id="search-dept">
+    <form action="#" id="search-dept">
         <input type="search" placeholder="Enter name of Department or Event to search" id="search_dept">
     </form>
     <table class="table table-hover event-table">
@@ -53,6 +53,28 @@
 {% endblock %}
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script>
+    $('.event-info').click(function () {
+            $('.container').fadeOut();
+            $('.event-list').fadeIn();
+
+            $('.nav-item').each(function () {
+                $(this).removeClass(" active");
+            });
+            $($(this)[0].parentElement).addClass("  active");
+        });
+    $('#search_dept').keyup(function () {
+            var valThis = $("#search_dept").val().toLowerCase();
+            if(valThis === ""){
+                $('.event-table > tbody > tr ').show();
+            } else {
+                $('.event-table > tbody > tr').each(function(){
+                    var text = $(this).text().toLowerCase();
+                    (text.indexOf(valThis) >= 0) ? $(this).show() : $(this).hide();
+                });
+           }
+        });
+</script>
 {% block script %}
 {% endblock %}
 </body>

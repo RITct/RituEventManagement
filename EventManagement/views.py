@@ -89,7 +89,7 @@ def admin_panel(request):
                 'name': event.name,
                 'list': []
             })
-            registrations = Registration.objects.filter(event=event)
+            registrations = WorkshopRegistration.objects.filter(workshop=event)
             for reg in registrations:
                 context['workshop_registrations'][i]['list'].append({
                     'profile': reg.profile.serialize,
