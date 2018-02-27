@@ -1,0 +1,10 @@
+.container{
+    padding: 5%;
+}
+button.btn a{
+    right: 20px;
+    position: absolute;
+}
+.card-header{
+    cursor: pointer;
+}

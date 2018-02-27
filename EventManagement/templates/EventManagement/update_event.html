@@ -20,10 +20,18 @@
 
 {% block body %}
     <div class="container">
-    <form action="{% url 'update_event' slug %}" method="post">
-        {{ form }}
+    <form action="{%  url 'update_event' slug %}" method="post" class="form">
+        <h3>Edit details of events:</h3>
         {% csrf_token %}
-    <input type="submit">
+        <span>Event Name : </span><input type="text" name="name" value="{{ form.Event.name }}" maxlength="255" required="" disabled id="id_name">
+        <span>Timing : </span><input type="datetime-local" name="timing" value="{{ form.Event.timing }}" maxlength="250" required="" id="id_timing">
+        <span>Additional Info : </span><textarea name="additional_data" cols="70" rows="2" required="" id="id_additional_data"></textarea>
+        <span>Amount : </span><input type="text" name="amount" value="{{ form.Event.amount }}" maxlength="10" required=""  disabled id="id_amount">
+        <span>Team Event? : <input type="checkbox" name="is_team_event" id="id_is_team_event"></span>
+        <span>Enter Venue : </span><input type="text" name="venue" value="{{ form.Event.venue }}" maxlength="500" required="" id="id_venue" placeholder="Venue">
+        <input type="submit">
     </form>
     </div>
+
+    {{ form.EventForm.Event.name}}
 {% endblock %}

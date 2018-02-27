@@ -1,0 +1,64 @@
+{% extends 'EventManagement/base.html' %}
+{% load static %}
+{% block link %}
+    <link rel="stylesheet" href="{% static 'event_volunteer.css' %}">
+{% endblock %}
+{% block nav-icons %}
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   Welcome {{ user.username }}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div id="accordion">
+            {% for reg in event_registrations %}
+              <div class="card">
+                <div class="card-header" data-toggle="collapse" data-target="#{{ reg.code }}" aria-expanded="false" aria-controls="{{ reg.code }}" id="{{ reg.name }}">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link" >
+                        {{ reg.code }} - {{ reg.name }} <a href="/update/event/{{ reg.code }}">Edit details and timing</a>
+                    </button>
+                  </h5>
+                </div>
+                <div id="{{ reg.code }}" class="collapse " aria-labelledby="{{ reg.name }}" data-parent="#accordion">
+                  <div class="card-body">
+                    <table class="table table-hover event-table">
+                      <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">College</th>
+                            <th scope="col">Reg ID</th>
+                            <th scope="col">Additional Data</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                            {% for student in reg.list %}
+                                <tr>
+                                    <td scope="row">{{ student.profile.name }}</td>
+                                    <td>{{ student.profile.email }}</td>
+                                    <td>{{ student.profile.college }}</td>
+                                    <td>{{ student.profile.id_code }}</td>
+                                    <td>{{ student.additional_data }}</td>
+                                </tr>
+                            {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+
+        </div>
+    </div>
+{% endblock %}
