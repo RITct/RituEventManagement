@@ -193,28 +193,41 @@ def get_event_data(request):
 
 
 def get_user_data(request):
+    id_code = request.GET['id']
+    try:
+        profile = Profile.objects.get(id_code=id_code)
+    except Profile.DoesNotExist:
+        return JsonResponse({'status':'fail'})
     data = {
-        'name': "test",
-        'college': "RIT",
-        'phone': '999999999',
-        'email': 'test@test.com',
-        'registrations': {
-            'events': [
-                {
-                    'code': "CSE01",
-                },
-                {
-                    'code': "CSE02"
-                }
-            ],
-            'workshops': [
-                {
-                    'code': "CSEW01",
-                },
-                {
-                    'code': "CSEW02"
-                }
-            ]
+        'name': profile.name,
+        'college': profile.college,
+        'phone': profile.phone,
+        'email': profile.email,
+        'regtistration':{
+            'events':[],
+            'workshops':[]
         }
     }
+        # 'registrations': {
+        #     'events': [
+        #         {
+        #             'code': "CSE01",
+        #         },
+        #         {
+        #             'code': "CSE02"
+        #         }
+        #     ],
+        #     'workshops': [
+        #         {
+        #             'code': "CSEW01",
+        #         },
+        #         {
+        #             'code': "CSEW02"
+        #         }
+        #     ]
+        # }
+    for registration in list(profile.registration_set.all()):
+        data['regtistration']['events'].append({'code':registration.event.code})
+    for registration in list(profile.workshopregistration_set.all()):
+        data['regtistration']['workshops'].append({'code':registration.workshop.code})
     return JsonResponse(data)
