@@ -17,7 +17,7 @@ from EventManagement.models import *
 def index(request):
     if request.user.is_authenticated:
         return redirect('admin_panel')
-    return render(request, 'EventManagement/sign_in.html')
+    return render(request, 'EventManagement/login.html')
 
 
 def logout_user(request):
@@ -147,16 +147,17 @@ class UpdateEvent(View):
         if event.organizer != event_v.organizer:
             raise PermissionDenied()
         form = EventForm(instance=event)
-        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user})
+        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user, 'slug':event_code})
 
     def post(self, request, event_code):
         if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
             raise PermissionDenied()
-        form = EventForm(request.POST)
+        event = get_object_or_404(Event, code=event_code)
+        form = EventForm(request.POST, instance=event)
         if form.is_valid():
             form.save()
             return redirect('index')
-        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user})
+        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user,'slug':event_code})
 
 
 #####################################################

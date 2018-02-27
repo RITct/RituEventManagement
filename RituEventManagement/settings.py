@@ -133,3 +133,4 @@ EMAIL_HOST_USER = EMAIL_USER
 LOGIN_REDIRECT_URL = "index"
 LOGIN_URL  = "index"
 LOGOUT_REDIRECT_URL = "index"
+LOGIN_TEMPLATE = "EventManagement/login.html"

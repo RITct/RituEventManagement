@@ -60,13 +60,13 @@ class EventVolunteer(Volunteer):
         return self.user.username
 
     @classmethod
-    def create(cls, username, first_name, last_name, email, phone, password, event_id):
+    def create(cls, username, first_name, last_name, email, phone, password, organizer):
         user = User(username=username, first_name=first_name, last_name=last_name, email=email)
         user.password = make_password(password)
         user.save()
-        user.groups.add(Group.objects.filter(name=EventVolunteer.GROUP_NAME))
+        user.groups.add(Group.objects.filter(name=EventVolunteer.GROUP_NAME).first())
         v = cls(user=user, phone=phone)
-        v.event_id = event_id
+        v.organizer = organizer
         v.save()
 
 
@@ -95,7 +95,7 @@ class RegistrationDesk(Volunteer):
 
     @classmethod
     def create(cls, username, first_name, last_name, email, phone, password):
-        r = Volunteer.create(username, first_name, last_name, email, phone, cls.GROUP_NAME)
+        r = Volunteer.create(username, first_name, last_name, email, phone, password, cls.GROUP_NAME)
 
 
 # class Head(Volunteer):
@@ -125,7 +125,7 @@ class Event(models.Model):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=10, unique=True)
     organizer = models.ForeignKey(Organizer, on_delete=models.CASCADE)
-    timing = models.DateTimeField(null=True)
+    timing = models.CharField(max_length=250,null=True)
     additional_data = models.TextField()
     amount = models.CharField(max_length=10, null=True)
     is_team_event = models.BooleanField(default=False)

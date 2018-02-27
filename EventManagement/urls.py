@@ -10,7 +10,7 @@ urlpatterns = [
     path('add/profile',views.add_profile, name="add_profile"),
     path('add/profile/success', TemplateView.as_view(template_name='EventManagement/profile_add_sucess.html'), name="add_profile_success"),
     path('update/event/<slug:event_code>', views.UpdateEvent.as_view(), name="update_event"),
-    path('login', auth_views.login, name="login"),
+    path('login', auth_views.login,{'template_name':'EventManagement/login.html'}, name="login"),
     path('logout', auth_views.logout, name="logout"),
 
 

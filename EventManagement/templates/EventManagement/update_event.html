@@ -20,6 +20,10 @@
 
 {% block body %}
     <div class="container">
+    <form action="{% url 'update_event' slug %}" method="post">
         {{ form }}
+        {% csrf_token %}
+    <input type="submit">
+    </form>
     </div>
 {% endblock %}
