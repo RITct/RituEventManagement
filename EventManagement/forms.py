@@ -10,6 +10,8 @@ class ProfileForm(forms.ModelForm):
 
 
 class EventForm(forms.ModelForm):
+    additional_data = forms.CharField(required=False)
+
     class Meta:
         model = Event
-        exclude = ['code', 'organizer']
+        fields = ['additional_data', 'timing', 'venue']

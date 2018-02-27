@@ -126,7 +126,7 @@ class Event(models.Model):
     code = models.CharField(max_length=10, unique=True)
     organizer = models.ForeignKey(Organizer, on_delete=models.CASCADE)
     timing = models.CharField(max_length=250,null=True)
-    additional_data = models.TextField()
+    additional_data = models.TextField(null=True)
     amount = models.CharField(max_length=10, null=True)
     is_team_event = models.BooleanField(default=False)
     venue = models.CharField(max_length=500)
@@ -152,7 +152,7 @@ class Workshop(models.Model):
 class WorkshopRegistration(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     workshop = models.ForeignKey(Workshop, on_delete=models.CASCADE)
-    additional_data = models.TextField()
+    additional_data = models.TextField(null=True)
     registrar = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     class Meta:
