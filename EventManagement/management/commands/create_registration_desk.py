@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = 'Initialize Database with event details'
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.NOTICE('Creating Registration Desk\n'))
+        self.stdout.write(self.style.NOTICE('Creating Event Volunteer\n'))
         first_name = str(input('First Name'))
         last_name = str(input('Last Name'))
         email = str(input('Email'))
