@@ -44,13 +44,13 @@
             <td>{{ event.venue }}</td>
         </tr>
       {% endfor %}
-      {% for event in workshop_list %}
+      {% for workshop in workshop_list %}
         <tr>
-            <td scope="row">{{ event.name }}</td>
-            <td>{{ event.organizer }}</td>
-            <td>{{ event.timing }}</td>
-            <td>{{ event.amount }}</td>
-            <td>{{ event.venue }}</td>
+            <td scope="row">{{ workshop.name }}</td>
+            <td>{{ workshop.organizer }}</td>
+            <td>{{ workshop.timing }}</td>
+            <td>{{ workshop.amount }}</td>
+            <td>{{ workshop.venue }}</td>
         </tr>
       {% endfor %}
       </tbody>
