@@ -206,7 +206,8 @@ def get_user_data(request):
         'regtistration':{
             'events':[],
             'workshops':[]
-        }
+        },
+        'status':'ok'
     }
         # 'registrations': {
         #     'events': [
