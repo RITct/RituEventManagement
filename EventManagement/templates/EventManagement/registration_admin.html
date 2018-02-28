@@ -27,6 +27,7 @@
 {% block body %}
     <div class="container">
                 {{ p_form.errors }}
+        {% if id_code %} <div class="success"> The registered ID Code is: {{ id_code }} </div> {% endif %}
     <div class="form">
         <h3>Add student and associate events.</h3>
         <form action="{% url 'add_profile' %}" name="form" id="form" method="post">
