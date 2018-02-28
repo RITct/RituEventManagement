@@ -1,6 +1,7 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
 from django.http import HttpResponseRedirect, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -64,6 +65,11 @@ def admin_panel(request):
         event_volunteer = RegistrationDesk.objects.get(user=request.user)
         context['event_volunteer'] = event_volunteer
         context['p_form'] = ProfileForm()
+        id_code = request.session.get('id_code', None)
+        print(id_code)
+        if id_code is not None:
+            del request.session['id_code']
+        context['id_code'] = id_code
         return render(request, 'EventManagement/registration_admin.html', context)
     elif belongs_to_group(request.user, RituAdmin.GROUP_NAME):
         context['admin'] = RituAdmin.objects.get(user=request.user)
@@ -118,7 +124,10 @@ def add_profile(request):
                 r.profile = profile
                 if event.is_team_event:
                     r.additional_data = addition_info
-                r.save()
+                try:
+                    r.save()
+                except IntegrityError:
+                    pass
                 context['event_list'].append(event.name)
         workshops = Workshop.objects.all()
         for workshop in workshops:
@@ -129,8 +138,12 @@ def add_profile(request):
                 r.profile = profile
                 if event.is_team_event:
                     r.additional_data = request.POST[event.code + "_additional"]
-                r.save()
+                try:
+                    r.save()
+                except IntegrityError:
+                    pass
                 context['workshop_list'].append(workshop.name)
+        request.session['id_code'] = profile.id_code
         return redirect('admin_panel')
     if form.is_valid():
         profile = form.save()
@@ -141,8 +154,7 @@ def add_profile(request):
                 r.event = event
                 r.registrar = request.user
                 r.profile = profile
-                if event.is_team_event:
-                    r.additional_data = addition_info
+                r.additional_data = addition_info
                 r.save()
                 context['event_list'].append(event.name)
         workshops = Workshop.objects.all()
@@ -152,14 +164,14 @@ def add_profile(request):
                 r.workshop = workshop
                 r.registrar = request.user
                 r.profile = profile
-                if event.is_team_event:
-                    r.additional_data = request.POST[event.code + "_additional"]
+                r.additional_data = addition_info
                 r.save()
                 context['workshop_list'].append(workshop.name)
         send_email.delay(profile.serialize, context)
+        request.session['id_code'] = profile.id_code
         return redirect('admin_panel')
-    print(form.data['name'])
     return render(request, "EventManagement/registration_admin.html", {'p_form': form,
+                                                                       'id_code':None,
                                                                        'name': form.data['name'],
                                                                        'phone': form.data['phone'],
                                                                        'college': form.data['college'],
