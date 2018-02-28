@@ -1,32 +1,12 @@
-Hi {{ profile.name }},<br><br>
+Hi {{ profile.name }},<br>
 
 <p>Welcome to Ritu'18.</p>
 
-{% if events.0 %}
-    Your registered events are: <br>
-    <ul>>
-        {% for event in events %}
-            <li>
-                {{ event }}
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-{% if workshops.0 %}
-    Your registered Workshops are: <br>
-    <ul>>
-        {% for event in workshops %}
-            <li>
-                {{ event }}
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-We hope you have a nice time :)<br><br>
+We hope you have a nice time :)<br>
 
 Please find your QR code attached.<br>
+
+Your ID is {{ profile.id_code }}
 
 Team Ritu <br>
 

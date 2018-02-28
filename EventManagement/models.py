@@ -159,8 +159,7 @@ class WorkshopRegistration(models.Model):
         unique_together = (('profile', 'workshop'),)
 
     def __str__(self):
-        return self.profile.name + " | " + self.additional_data
-
+        return str(self.profile) + " | " + str(self.workshop) + ( " | " + self.additional_data if self.additional_data is not None else "")
 
 class Registration(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)

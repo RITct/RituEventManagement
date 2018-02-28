@@ -9,7 +9,7 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 
 from EventManagement.celery import send_email
-from EventManagement.forms import ProfileForm, EventForm
+from EventManagement.forms import ProfileForm, EventForm, WorkshopForm
 from EventManagement.utils import belongs_to_group, group_login_required
 from EventManagement.models import *
 
@@ -53,7 +53,7 @@ def admin_panel(request):
                 'name': event.name,
                 'list': []
             })
-            registrations = Registration.objects.filter(event=event)
+            registrations = WorkshopRegistration.objects.filter(workshop=event)
             for reg in registrations:
                 context['workshop_registrations'][i]['list'].append({
                     'profile': reg.profile.serialize,
@@ -160,13 +160,13 @@ def add_profile(request):
         return redirect('admin_panel')
     print(form.data['name'])
     return render(request, "EventManagement/registration_admin.html", {'p_form': form,
-                                                                       'name':form.data['name'],
-                                                                       'phone':form.data['phone'],
-                                                                       'college':form.data['college'],
-                                                                       'email':form.data['email'],
+                                                                       'name': form.data['name'],
+                                                                       'phone': form.data['phone'],
+                                                                       'college': form.data['college'],
+                                                                       'email': form.data['email'],
                                                                        'additional_info': addition_info,
-                                                                          'event_list': Event.objects.all(),
-                                                                          'workshop_list': Workshop.objects.all()})
+                                                                       'event_list': Event.objects.all(),
+                                                                       'workshop_list': Workshop.objects.all()})
 
 
 class UpdateEvent(View):
@@ -180,8 +180,8 @@ class UpdateEvent(View):
         form = EventForm(instance=event)
         return render(request, 'EventManagement/update_event.html', {'form': form,
                                                                      'user': request.user,
-                                                                     'event':event,
-                                                                     'slug':event_code})
+                                                                     'event': event,
+                                                                     'slug': event_code})
 
     def post(self, request, event_code):
         if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
@@ -192,8 +192,35 @@ class UpdateEvent(View):
             form.save()
             return redirect('index')
         return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user,
-                                                                     'event':event,
-                                                                     'slug':event_code})
+                                                                     'event': event,
+                                                                     'slug': event_code})
+
+
+class UpdateWorkshop(View):
+    def get(self, request, event_code):
+        if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
+            raise PermissionDenied()
+        event_v = EventVolunteer.objects.get(user=request.user)
+        event = get_object_or_404(Workshop, code=event_code)
+        if event.organizer != event_v.organizer:
+            raise PermissionDenied()
+        form = WorkshopForm(instance=event)
+        return render(request, 'EventManagement/update_event.html', {'form': form,
+                                                                     'user': request.user,
+                                                                     'event': event,
+                                                                     'slug': event_code})
+
+    def post(self, request, event_code):
+        if not belongs_to_group(request.user, EventVolunteer.GROUP_NAME):
+            raise PermissionDenied()
+        event = get_object_or_404(Event, code=event_code)
+        form = WorkshopForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+        return render(request, 'EventManagement/update_event.html', {'form': form, 'user': request.user,
+                                                                     'event': event,
+                                                                     'slug': event_code})
 
 
 #####################################################
@@ -233,20 +260,20 @@ def get_user_data(request):
     try:
         profile = Profile.objects.get(id_code=id_code)
     except Profile.DoesNotExist:
-        return JsonResponse({'status':'fail'})
+        return JsonResponse({'status': 'fail'})
     data = {
         'name': profile.name,
         'college': profile.college,
         'phone': profile.phone,
         'email': profile.email,
-        'regtistration':{
-            'events':[],
-            'workshops':[]
+        'regtistration': {
+            'events': [],
+            'workshops': []
         },
-        'status':'ok'
+        'status': 'ok'
     }
     for registration in list(profile.registration_set.all()):
-        data['regtistration']['events'].append({'code':registration.event.code})
+        data['regtistration']['events'].append({'code': registration.event.code})
     for registration in list(profile.workshopregistration_set.all()):
-        data['regtistration']['workshops'].append({'code':registration.workshop.code})
+        data['regtistration']['workshops'].append({'code': registration.workshop.code})
     return JsonResponse(data)
