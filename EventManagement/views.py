@@ -122,8 +122,7 @@ def add_profile(request):
                 r.event = event
                 r.registrar = request.user
                 r.profile = profile
-                if event.is_team_event:
-                    r.additional_data = addition_info
+                r.additional_data = addition_info
                 try:
                     r.save()
                 except IntegrityError:
@@ -136,8 +135,7 @@ def add_profile(request):
                 r.workshop = workshop
                 r.registrar = request.user
                 r.profile = profile
-                if event.is_team_event:
-                    r.additional_data = request.POST[event.code + "_additional"]
+                r.additional_data = addition_info
                 try:
                     r.save()
                 except IntegrityError:
