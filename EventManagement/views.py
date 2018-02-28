@@ -164,7 +164,7 @@ def add_profile(request):
                 r.workshop = workshop
                 r.registrar = request.user
                 r.profile = profile
-                r.additional_data = request.POST[event.code + "_additional"]
+                r.additional_data = addition_info
                 r.save()
                 context['workshop_list'].append(workshop.name)
         send_email.delay(profile.serialize, context)
